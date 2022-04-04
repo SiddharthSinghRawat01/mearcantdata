@@ -1,9 +1,10 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
+const md5 = require("md5");
 const connection = require("../config/db_connection");
 
-const route = express();
+const route = express.Router();
 route.use(bodyParser.urlencoded({extended: true}));
 route.use(bodyParser.json());
 
@@ -13,19 +14,49 @@ route.get("/",(req,res)=>{
 
 //register dashbord
 route.post("/register",(req,res)=>{
-    const Email = req.body.email
-    const Mobile = req.body.mobile
-    const Password = req.body.password
-    const ConfirmPass = req.body.confirmPass
+    let Userid = req.body.userid
+    const Password = md5(req.body.password)
 
-    if(Password !== ConfirmPass){
-        console.log("password not matched")
-
-    } else {
-        console.log("matched")
-
-        sql = ""
+    function validEmail(email){
+        const formate = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        return formate.test(email);
     }
+
+    function validNumber(number){
+        const formate = /^\d{10}$/;
+        return formate.test(number);
+    }
+    let sql = '';
+
+    if (validEmail(Userid)){
+        sql = "INSERT INTO tbl_user (email,password) VALUE ('"+Userid+"','"+Password+"')"
+    }
+
+    if (validNumber(Userid)){
+        sql = "INSERT INTO tbl_user (mobile_no,password) VALUE ('"+Userid+"','"+Password+"')"
+    }
+
+    sql1 = "SELECT * FROM tbl_user WHERE email = '"+Userid+"' OR mobile_no = '"+Userid+"'"
+    connection.query(sql1,(err,foundUser,feilds)=>{
+        if(err){throw err}
+        if(foundUser.length > 0){
+            console.log("user found")
+
+        }else{
+            console.log("not found user")
+            connection.query(sql,(err,result)=>{
+                if(err){throw err} 
+                else {
+                    console.log(result)
+                    
+                }
+            })
+        }
+    })
+
+    
+
+    
 })
 
 //database not found
@@ -171,51 +202,39 @@ route.post("/bussiness_profile",(req,res)=>{
 
 })
 
+
+// business funding
 route.post("/business_funding",(req,res)=>{
+
     const Account_Holder = req.body.account_Holder 
     const Bank_Account = req.body.bank_Account
     const Bank_Routing = req.body.bank_Routing
 
-    sql = "UPDATA tbl_use "
+    
 })
 
+
+//change password completed by ram
 route.post("/change_password",(req,res)=>{
-    const Password = req.body.password
+    const Password = md5(req.body.password);
     const Email = req.body.email
 
+    console.log(Email)
+    console.log(Password)
 
 
-    const sql = "SELECT * FROM TABLE_NAME WHERE name = '"+Email+"'";
+    const sql = "SELECT * FROM tbl_user WHERE email = '"+Email+"'";
     connection.query(sql,(err,foundUser)=>{
-        if(err){throw err} 
-        else if (!foundUser){
-            console.log("no user of this name exist")
-            // res.send("/login")
-        } else {
-            console.log(foundUser[0].email)
-            bcrypt.compare(Password,foundUser[0].password,(err,foundPassword)=>{
-                if (err){throw err} 
-                else if (!foundPassword){
-                    console.log("incrrect password")
-                    // res.send("/login")
-                } else {
-
-                    const sql = "UPDATE TABLE_NAME SET password = '"+Password+"' where email = '"+foundUser[0].email+"'"
-                    connection.query(sql,(err,update)=>{
-                        if(err){throw err}
-                        else {
-                            console.log("password Updated")
-                        }
-                    });
-                }
-            })
-
+        if(err){throw err}
+        if(foundUser.length > 0){
+            console.log(foundUser)
+            console.log(foundUser[0].password)
+        }else {
+            console.log("no user exist")
         }
     })
 
 });
-
-
 
 
 module.exports = route
