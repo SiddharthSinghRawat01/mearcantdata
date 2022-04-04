@@ -3,6 +3,24 @@ const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const md5 = require("md5");
 const connection = require("../config/db_connection");
+const path = require('path');
+const multer = require("multer");
+
+
+const storage = multer.diskStorage({
+    destination: (req,file,cb)=>{
+        cb(null, path.join(__dirname,'../image'));
+    },
+    filename : function(req, file, cb){
+        let imgname = new Date().toString();
+        imgname = imgname.replace(/ |:|\+|\(|\)/gi, '-');
+        let imgext = path.extname(file.originalname);
+        let image = `${imgname}${imgext}`;
+        cb(null, image);
+    }
+});
+
+const upload = multer({storage: storage});
 
 const route = express.Router();
 route.use(bodyParser.urlencoded({extended: true}));
@@ -158,7 +176,9 @@ route.post("/new_employee",(req,res)=>{
 });
 
 // business setting recipt Setting
-
+route.post("/recipt_setting",upload.single("image"),(req,res)=>{
+    console.log("image upload")
+})
 
 
 //bussines profile complete
@@ -230,7 +250,7 @@ route.post("/change_password",(req,res)=>{
         if(foundUser.length > 0){
             console.log(foundUser[0].password)
             
-            if (CurrentPassword === foundUser[0].password){
+            if (currentpass === foundUser[0].password){
                 const sql = "UPDATE tbl_user set password = '"+Password+"' WHERE email = '"+foundUser[0].email+"' "
                 connection.query(sql,(err,update)=>{
                     if(err){throw err}
@@ -239,7 +259,7 @@ route.post("/change_password",(req,res)=>{
                     }
                 })                
             }else{
-                console.log("current pass do not match")
+                console.log("current pass do not match the password")
             }
             
         }else {
