@@ -217,6 +217,7 @@ route.post("/business_funding",(req,res)=>{
 //change password completed by ram
 route.post("/change_password",(req,res)=>{
     const Password = md5(req.body.password);
+    const CurrentPassword = md5(req.body.currentpass)
     const Email = req.body.email
 
     console.log(Email)
@@ -227,8 +228,20 @@ route.post("/change_password",(req,res)=>{
     connection.query(sql,(err,foundUser)=>{
         if(err){throw err}
         if(foundUser.length > 0){
-            console.log(foundUser)
             console.log(foundUser[0].password)
+            
+            if (CurrentPassword === foundUser[0].password){
+                const sql = "UPDATE tbl_user set password = '"+Password+"' WHERE email = '"+foundUser[0].email+"' "
+                connection.query(sql,(err,update)=>{
+                    if(err){throw err}
+                    if (update){
+                        console.log("updated")
+                    }
+                })                
+            }else{
+                console.log("current pass do not match")
+            }
+            
         }else {
             console.log("no user exist")
         }
