@@ -12,22 +12,20 @@ route.get("/",(req,res)=>{
 })
 
 //register dashbord
-route.post("/log-in",(req,res)=>{
+route.post("/register",(req,res)=>{
     const Email = req.body.email
     const Mobile = req.body.mobile
+    const Password = req.body.password
+    const ConfirmPass = req.body.confirmPass
 
-    sql = "SELECT email,mobile_no FROM tbl_user WHERE email ='"+Email+"' Or mobile_no ='"+Mobile+"'"
-    connection.query(sql,(err,user)=>{
-        if(user) {
-            console.log(user[0].email)
-            if (user[0].email === Email ){
-                console.log("noo user")
-            }else{
-                console.log("user")
-            }
-            
-        }
-    })
+    if(Password !== ConfirmPass){
+        console.log("password not matched")
+
+    } else {
+        console.log("matched")
+
+        sql = ""
+    }
 })
 
 //database not found
@@ -131,9 +129,55 @@ route.post("/new_employee",(req,res)=>{
 // business setting recipt Setting
 
 
-//bussines profile
+
+//bussines profile complete
+
+route.post("/bussiness_profile",(req,res)=>{
+    console.log("business profile")
+    const Bussiness_Name = req.body.bussiness_Name
+    const Bussiness_Location = req.body.bussiness_Location
+    const Bussiness_Currencies = req.body.bussiness_Currencies
+    const Job_Title = req.body.job_Title
+    const Website = req.body.website
+    const Country = req.body.country
+    const State = req.body.state
+    const City = req.body.city
+    const Zip = req.body.zip
+    const Phone_Number = req.body.phone_Number
+    const Bussiness_Fax = req.body.bussiness_Fax
+
+    const Seprate_Corporate_Add = req.body.seprate_Corporate_Add
+    const Corporate_Location = req.body.corporate_Location
+    const Corporate_Country = req.body.corporate_country
+    const Corporate_State= req.body.corporate_state
+    const Corporate_City = req.body.corporate_city
+    const Corporate_Zip = req.body.corporate_zip
+    let sql;
+    if(Seprate_Corporate_Add ){
+        sql="INSERT INTO tbl_user (`bname`,`blocation`,`currencies_req`,`job_title`,`website`,`busines_Country`,`busines_State`,`busines_City`,`busines_Code`,`busines_Number`,`busines_Fax`,`corporate_enable`,`corporate_Location`,`corporate_Country`,`Corporate_state`,`corporate_City`,`corporate_Zip`) VALUES ('"+Bussiness_Name+"','"+Bussiness_Location+"','"+Bussiness_Currencies+"','"+Job_Title+"','"+Website+"','"+Country+"','"+State+"','"+City+"','"+Zip+"','"+Phone_Number+"','"+Bussiness_Fax+"','"+Seprate_Corporate_Add+"','"+Corporate_Location+"','"+Corporate_Country+"','"+Corporate_State+"','"+Corporate_City+"','"+Corporate_Zip+"')"
+    } else{
+
+        sql="INSERT INTO tbl_user (`bname`,`blocation`,`currencies_req`,`job_title`,`website`,`busines_Country`,`busines_State`,`busines_City`,`busines_Code`,`busines_Number`,`busines_Fax`) VALUES ('"+Bussiness_Name+"','"+Bussiness_Location+"','"+Bussiness_Currencies+"','"+Job_Title+"','"+Website+"','"+Country+"','"+State+"','"+City+"','"+Zip+"','"+Phone_Number+"','"+Bussiness_Fax+"')"
+    }
+
+    connection.query(sql,(err,result)=>{
+        if(err){throw err}
+        console.log(result)
+        res.send(result)
+    });    
 
 
+
+
+})
+
+route.post("/business_funding",(req,res)=>{
+    const Account_Holder = req.body.account_Holder 
+    const Bank_Account = req.body.bank_Account
+    const Bank_Routing = req.body.bank_Routing
+
+    sql = "UPDATA tbl_use "
+})
 
 route.post("/change_password",(req,res)=>{
     const Password = req.body.password
