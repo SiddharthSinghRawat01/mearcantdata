@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const connection = require("../config/db_connection");
 const path = require('path');
 const multer = require("multer");
+const jwt = require('jsonwebtoken');
 
 
 const storage = multer.diskStorage({
@@ -46,7 +47,6 @@ route.post("/register",(req,res)=>{
         return formate.test(number);
     }
 
-    
     bcrypt.hash(Password,8,(err,hashPassword)=>{
         if(err){throw err}
         if(hashPassword){
@@ -80,6 +80,51 @@ route.post("/register",(req,res)=>{
     });
     
 });
+
+
+//login dashbord
+route.post("/login",(req,res)=>{
+    const Userid = req.body.userid
+    const Password = req.body.password
+
+    // email mobile no. validation
+
+    sql = "SELECT * FROM tbl_user WHERE email = '"+Userid+ "' OR mobile_no = '"+Userid+"'"
+    connection.query(sql,(err,foundUser)=>{
+        if(err){throw err}
+        if(foundUser.length > 0){
+            console.log(foundUser[0].password)
+            bcrypt.compare(Password,foundUser[0].password,(err,passwordMatch)=>{
+                if(err){throw err}
+                if(!passwordMatch){
+                    console.log("incorrect passsword")
+                    // res.redirect("/login")
+                }
+                if(passwordMatch){
+                    console.log("password match")
+                    // MADE FEILD FOR JWT TOKEN
+                    let token = jwt.sign({user: '123'}, 'SECRET')
+                    console.log(token)
+                    sql = "UPDATE tbl_user set JWToken = '"+token+"' where name = '"+foundUser[0].email+"' OR mobile_no = '"+foundUser[0].mobile_no+"'"
+                    connection.query(sql,(err,update,feilds)=>{
+                        if (err){throw err}
+                        if(update){
+                            console.log("12341")
+                            console.log(foundUser[0].fname)
+                            console.log("updated!!")                            
+                        }
+                    })
+                }
+
+            })
+
+        }else{
+            console.log("you shoud register")
+            // res.redirect("/register")
+        }
+    })
+})
+
 
 //database not found
 route.post("/Single_payout",(req,res)=>{
