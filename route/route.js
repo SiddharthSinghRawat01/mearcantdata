@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const bcrypt = require("bcrypt");
 const md5 = require("md5");
+const bcrypt = require("bcrypt");
 const connection = require("../config/db_connection");
 const path = require('path');
 const multer = require("multer");
@@ -33,7 +33,8 @@ route.get("/",(req,res)=>{
 //register dashbord
 route.post("/register",(req,res)=>{
     let Userid = req.body.userid
-    const Password = md5(req.body.password)
+    const Password = req.body.password
+    let sql = '';
 
     function validEmail(email){
         const formate = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -44,38 +45,41 @@ route.post("/register",(req,res)=>{
         const formate = /^\d{10}$/;
         return formate.test(number);
     }
-    let sql = '';
 
-    if (validEmail(Userid)){
-        sql = "INSERT INTO tbl_user (email,password) VALUE ('"+Userid+"','"+Password+"')"
-    }
-
-    if (validNumber(Userid)){
-        sql = "INSERT INTO tbl_user (mobile_no,password) VALUE ('"+Userid+"','"+Password+"')"
-    }
-
-    sql1 = "SELECT * FROM tbl_user WHERE email = '"+Userid+"' OR mobile_no = '"+Userid+"'"
-    connection.query(sql1,(err,foundUser,feilds)=>{
+    
+    bcrypt.hash(Password,8,(err,hashPassword)=>{
         if(err){throw err}
-        if(foundUser.length > 0){
-            console.log("user found")
+        if(hashPassword){
+            
+            if (validEmail(Userid)){
+                sql = "INSERT INTO tbl_user (email,password) VALUE ('"+Userid+"','"+hashPassword+"')"
+            }
+        
+            if (validNumber(Userid)){
+                sql = "INSERT INTO tbl_user (mobile_no,password) VALUE ('"+Userid+"','"+hashPassword+"')"
+            }
 
-        }else{
-            console.log("not found user")
-            connection.query(sql,(err,result)=>{
-                if(err){throw err} 
-                else {
-                    console.log(result)
-                    
+            sql1 = "SELECT * FROM tbl_user WHERE email = '"+Userid+"' OR mobile_no = '"+Userid+"'"
+            connection.query(sql1,(err,foundUser,feilds)=>{
+                if(err){throw err}
+                if(foundUser.length > 0){
+                    console.log("user found")
+        
+                }else{
+                    console.log("not found user")
+                    connection.query(sql,(err,result)=>{
+                        if(err){throw err} 
+                        else {
+                            console.log(result)
+                            
+                        }
+                    })
                 }
-            })
+            })            
         }
-    })
-
+    });
     
-
-    
-})
+});
 
 //database not found
 route.post("/Single_payout",(req,res)=>{
@@ -178,10 +182,50 @@ route.post("/new_employee",(req,res)=>{
 // business setting recipt Setting
 route.post("/recipt_setting",upload.single("image"),(req,res)=>{
     console.log("image upload")
+    
+    const image = req.file.filename;
+    const Bussiness_Name = req.body.bussiness_Name;
+    const Street_Address = req.body.street_Address;
+    const City = req.body.city;
+    const State = req.body.state
+    const Zip = req.body.zip
+    const Phone_Number = req.body.phone_Number
+    const Website = req.body.website
+    const Email = req.body.email
+
+    const BCC_Email_Recipts = req.body.bCC_Email_Recipts
+    const BCC_Email_Address = req.body.bCC_Email_Address
+
+    const Display_Sold = req.body.display_Sold
+
+    const Display_Social_Media = req.body.display_Social_Media
+    const Facebook_User = req.body.facebook_User
+    const Facebook_Link = req.body.facebook_Link
+    const Twitter_User = req.body.twitter_User
+    const Twitter_Link = req.body.twitter_Link
+    const Customer_Message = req.body.customer_Message
+
+    let sql = "";
+
+    if(BCC_Email_Recipts && Display_Social_Media){
+    sql = "INSERT INTO tbl_merchant_receipt_details (image,business_name,street_address,city,state,zip,phone,website,email,bcc_email_status,bcc_email,display_soldby,display_smb,fb_user,fb_link,twitter_user,twitter_link,custom_message) VALUES ('"+image+"','"+Bussiness_Name+"','"+Street_Address+"','"+City+"','"+State+"','"+Zip+"','"+Phone_Number+"','"+Website+"','"+Email+"','"+BCC_Email_Recipts+"','"+BCC_Email_Address+"','"+Display_Sold+"','"+Display_Social_Media+"','"+Facebook_User+"','"+Facebook_Link+"','"+Twitter_User+"','"+Twitter_Link+"','"+Customer_Message+"')"
+    }
+    if(BCC_Email_Address){
+        sql = "INSERT INTO tbl_merchant_receipt_details (image,business_name,street_address,city,state,zip,phone,website,email,bcc_email_status,bcc_email,display_soldby) VALUES ('"+image+"','"+Bussiness_Name+"','"+Street_Address+"','"+City+"','"+State+"','"+Zip+"','"+Phone_Number+"','"+Website+"','"+Email+"','"+BCC_Email_Recipts+"','"+BCC_Email_Address+"','"+Display_Sold+"')"
+    }
+    if(Display_Social_Media){
+        sql = "INSERT INTO tbl_merchant_receipt_details (image,business_name,street_address,city,state,zip,phone,website,email,display_soldby,display_smb,fb_user,fb_link,twitter_user,twitter_link,custom_message) VALUES ('"+image+"','"+Bussiness_Name+"','"+Street_Address+"','"+City+"','"+State+"','"+Zip+"','"+Phone_Number+"','"+Website+"','"+Email+"','"+Display_Sold+"','"+Display_Social_Media+"','"+Facebook_User+"','"+Facebook_Link+"','"+Twitter_User+"','"+Twitter_Link+"','"+Customer_Message+"')"
+
+    }
+    connection.query(sql,(err,result)=>{
+        if(err){throw err}
+        else{ console.log(result); console.log("result INserted")}
+    })
+    
 })
 
 
-//bussines profile complete
+//bussines profile not complete complete
 
 route.post("/bussiness_profile",(req,res)=>{
     console.log("business profile")
@@ -210,7 +254,6 @@ route.post("/bussiness_profile",(req,res)=>{
 
         sql="INSERT INTO tbl_user (`bname`,`blocation`,`currencies_req`,`job_title`,`website`,`busines_Country`,`busines_State`,`busines_City`,`busines_Code`,`busines_Number`,`busines_Fax`) VALUES ('"+Bussiness_Name+"','"+Bussiness_Location+"','"+Bussiness_Currencies+"','"+Job_Title+"','"+Website+"','"+Country+"','"+State+"','"+City+"','"+Zip+"','"+Phone_Number+"','"+Bussiness_Fax+"')"
     }
-
     connection.query(sql,(err,result)=>{
         if(err){throw err}
         console.log(result)
