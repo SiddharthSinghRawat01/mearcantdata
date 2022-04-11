@@ -4,9 +4,17 @@ const bcrypt = require("bcrypt");
 const bodyParser = require("body-parser");
 const multer = require("multer");
 const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 
+var currentdate = new Date(); 
+var datetime =  currentdate.getDate() + "-"
+                + (currentdate.getMonth()+1)  + "-" 
+                + currentdate.getFullYear() + " "  
+                + currentdate.getHours() + ":"  
+                + currentdate.getMinutes() + ":" 
+                + currentdate.getSeconds();
 
-
+                console.log(datetime)
 
 let foriginKey 
 
@@ -140,8 +148,9 @@ const userco = {
                         console.log("password match")
                         // MADE FEILD FOR JWT TOKEN
                         let token = jwt.sign({user: '123'}, 'SECRET')
-                        console.log(token)
-    
+                        const coo = res.cookie('name', token) //Sets name = express
+
+                        console.log('Cookies: ', req.cookies);
                         // let header = res.set("id", foundUser[0].id);
                         // console.log("//")
                         // console.log(res.getHeader("id"));
@@ -169,7 +178,7 @@ const userco = {
         })
     },
 
-    // UPDATE
+    // UPdate
     single_payout: (req,res)=>{
         const AccountNo = req.body.accountNo;
         const IFSC = req.body.ifsc;
@@ -349,7 +358,6 @@ const userco = {
         
     },
 
-    // it shoud be updated not inserted
     bussiness_profile: (req,res)=>{
         console.log("business profile")
         const Bussiness_Name = req.body.bussiness_Name
@@ -404,28 +412,56 @@ const userco = {
     
     },
 
-    // it should be updated not inserted to tbl_user
+// date time
     business_funding: (req,res)=>{
 
         const Account_Holder = req.body.account_Holder 
         const Bank_Account = req.body.bank_Account
         const Bank_Routing = req.body.bank_Routing
+        console.log(datetime)
 
-        sql = "INSERT INTO TABLENAME () VALUE ('"+ +"')"
-            connection.query(sql,(err,result)=>{
-                if(err){throw eresultrr}
-                if(result){
-                    console.log()
-                }
-            })
-    
-        
+        const sql = "SELECT id FROM tbl_user WHERE id = '"+foriginKey+"'"
+        connection.query(sql,(err,result)=>{
+            if(err){throw err}
+            if(result.length>0){
+                console.log(result)
+
+                const sql = "UPDATE tbl_user SET funding_holder = '"+Account_Holder+"', funding_account_no = '"+Bank_Account+"', funding_code = '"+Bank_Routing+"',updated_on = '"+datetime+"'  WHERE id = '"+foriginKey+"'"
+                connection.query(sql,(err,update)=>{
+                    if(err){throw err}
+                    if(update){
+                        console.log(update)}
+                    })
+            }
+        })
     },
 
     bussiness_alerts:(req,res)=>{
-        const BasicEmail = req.body.basicEmail;
-        const DisplaySocialMedia = req.body.displaySocialMedia
+        const BatchActivity = req.body.batchActivity;
+        const BatchOver = req.body.batchOver;
+        const FillBatchOver = req.body.fillBatchOver;
+        const BatchUnder = req.body.batchUnder;
+        const FillBatchUnder = req.body.fillBatchUnder;
+        const Notransaction = req.body.notransaction;
+        const FillNotruncation = req.body.fillNotruncation;
+        
+        const sql = "SELECT id FROM tbl_user WHERE id = '"+foriginKey+"'"
+        connection.query(sql,(err,result)=>{
+            if(err){throw err}
+            if(result.length>0){
+                console.log(result)
+                const sql = "UPDATE tbl_user SET daily_batch_activity_summary = '"+BatchActivity+"',batch_over = '"+BatchOver+"',batch_under = '"+BatchUnder+"',no_transaction_activity = '"+Notransaction+"',batch_over_rate = '"+FillBatchOver+"',batch_under_rate = '"+FillBatchUnder+"',no_transaction_activity_days = '"+FillNotruncation+"', updated_on = '"+datetime+"'WHERE id = '"+foriginKey+"'"
+                connection.query(sql,(err,update)=>{
+                    if(err){throw err}
+                    if(update){
+                        console.log(update)
+                    }
+                })
+            }
+        })
 
+
+        
         
     },
 

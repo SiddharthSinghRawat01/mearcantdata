@@ -65,6 +65,8 @@ route.post("/bussiness_profile",upload.none(),controller.bussiness_profile)
 // business funding
 route.post("/business_funding",upload.none(),controller.business_funding)
 
+// business alert
+route.post("/bussiness_alerts",upload.none(),controller.bussiness_alerts)
 
 //change password not completed by md5 removes
 route.post("/change_password",upload.none(),controller.change_password);
