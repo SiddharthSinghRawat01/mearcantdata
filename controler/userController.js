@@ -149,7 +149,7 @@ const userco = {
                         foriginKey = foundUser[0].id
                         console.log(foriginKey)
     
-                        sql = "UPDATE tbl_user set JWToken = '"+token+"' where name = '"+foundUser[0].email+"' OR mobile_no = '"+foundUser[0].mobile_no+"'"
+                        sql = "UPDATE tbl_user set verification_token = '"+token+"' where name = '"+foundUser[0].email+"' OR mobile_no = '"+foundUser[0].mobile_no+"'"
                         connection.query(sql,(err,update,feilds)=>{
                             if (err){throw err}
                             if(update){
@@ -370,18 +370,34 @@ const userco = {
         const Corporate_State= req.body.corporate_state
         const Corporate_City = req.body.corporate_city
         const Corporate_Zip = req.body.corporate_zip
-        let sql;
-        if(Seprate_Corporate_Add ){
-            sql="INSERT INTO tbl_user (`bname`,`blocation`,`currencies_req`,`job_title`,`website`,`busines_Country`,`busines_State`,`busines_City`,`busines_Code`,`busines_Number`,`busines_Fax`,`corporate_enable`,`corporate_Location`,`corporate_Country`,`Corporate_state`,`corporate_City`,`corporate_Zip`) VALUES ('"+Bussiness_Name+"','"+Bussiness_Location+"','"+Bussiness_Currencies+"','"+Job_Title+"','"+Website+"','"+Country+"','"+State+"','"+City+"','"+Zip+"','"+Phone_Number+"','"+Bussiness_Fax+"','"+Seprate_Corporate_Add+"','"+Corporate_Location+"','"+Corporate_Country+"','"+Corporate_State+"','"+Corporate_City+"','"+Corporate_Zip+"')"
-        } else{
-    
-            sql="INSERT INTO tbl_user (`bname`,`blocation`,`currencies_req`,`job_title`,`website`,`busines_Country`,`busines_State`,`busines_City`,`busines_Code`,`busines_Number`,`busines_Fax`) VALUES ('"+Bussiness_Name+"','"+Bussiness_Location+"','"+Bussiness_Currencies+"','"+Job_Title+"','"+Website+"','"+Country+"','"+State+"','"+City+"','"+Zip+"','"+Phone_Number+"','"+Bussiness_Fax+"')"
-        }
+        
+        
+        const sql = "SELECT id FROM tbl_user WHERE id = '"+foriginKey+"'"
         connection.query(sql,(err,result)=>{
             if(err){throw err}
-            console.log(result)
-            res.send(result)
-        });    
+            if(result.length > 0){
+                console.log(result)
+
+                let sql;
+        
+                if(Seprate_Corporate_Add ){
+                    sql="UPDATE tbl_user SET bname  = '"+Bussiness_Name+"',blocation = '"+Bussiness_Location+"',currencies_req = '"+Bussiness_Currencies+"',job_title = '"+Job_Title+"',website = '"+Website+"',busines_Country = '"+Country+"',busines_State = '"+State+"',busines_City = '"+City+"',busines_Code = '"+Zip+"',mobile_no = '"+Phone_Number+"',busines_Fax = '"+Bussiness_Fax+"',corporate_enable = '"+Seprate_Corporate_Add+"',corporate_Location = '"+Corporate_Location+"',corporate_Country = '"+Corporate_Country+"',Corporate_state = '"+Corporate_State+"',corporate_City = '"+Corporate_City+"',corporate_Zip = '"+Corporate_Zip+"' WHERE id = '"+foriginKey+"'" ;
+                } else{
+            
+                    sql="UPDATE tbl_user SET bname = '"+Bussiness_Name+"',blocation = '"+Bussiness_Location+"',currencies_req = '"+Bussiness_Currencies+"',job_title = '"+Job_Title+"',website = '"+Website+"',busines_Country = '"+Country+"',busines_State = '"+State+"',busines_City = '"+City+"',busines_Code = '"+Zip+"',mobile_no = '"+Phone_Number+"',busines_Fax = '"+Bussiness_Fax+"' WHERE id = '"+foriginKey+"'" ;
+                }
+                connection.query(sql,(err,result)=>{
+                    if(err){throw err}
+                    console.log(result)
+                    res.send(result)
+                });                  
+
+            }else(
+                console.log("user not found")
+            )
+        })
+        
+          
     
     
     
