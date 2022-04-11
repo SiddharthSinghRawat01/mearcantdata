@@ -13,9 +13,45 @@ let foriginKey
 const userco = {
 
     register: (req,res)=>{
-        let Userid = req.body.userid
-        const Password = req.body.password
+        let Userid = req.body.userid;
+        const Password = req.body.password;
+        const ConfirmPassword = req.body.confirmPassword;
         
+        // Company proile
+        const CompanyName = req.body.companyName; // bname
+        const TradingAs = req.body.tradingAs; // account_type
+        const RegisteredAdd = req.body.registeredAdd;  // blocation
+        const CompanyNumber = req.body.companyNumber; // mobile_no
+        const Country = req.body.country; // country
+        const Fname = req.body.fname; // fname
+        const Lname = req.body.lname; // lname
+        const MainContact =  Fname +" "+ Lname ;  //name
+        const MainEmail = req.body.mainEmail; // main_contact_email
+
+
+        // Directo's Info
+
+        const FullName = req.body.fullName; // director1_name
+        const DOB = req.body.dob; // director1_dob
+        const Nationality = req.body.nationality; // director1_nationality
+        const D2FullName = req.body.d2FullName; // director2_name
+        const D2DOB = req.body.d2dob; // director2_dob
+        const D2Nationality = req.body.d2Nationality; // director2_nationality
+        
+        // Share Holder Info
+
+        const SFullName = req.body.sfullName; // shareholder1_name
+        const SDOB = req.body.sdob; // shareholder1_dob
+        const SNationality = req.body.snationality; // shareholder1_nationality
+        const S2FullName = req.body.s2FullName; // shareholder2_name
+        const S2DOB = req.body.s2dob; //shareholder2_dob
+        const S2Nationality = req.body.s2Nationality; //shareholder2_nationality
+
+    
+        // Solutiion apply for
+
+        const SelectCountry = req.body.selectCountry; // solution_apply_for_country
+        const ModeofSolution = req.body.modeofSolution; // mode_of_solution
 
         function validEmail(email){
             const formate = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -27,6 +63,11 @@ const userco = {
             return formate.test(number);
         }
     
+
+        if(ConfirmPassword != Password){
+            console.log("password do not match")
+        }
+        if(ConfirmPassword === Password){
         const sql = "SELECT email,mobile_no FROM tbl_user WHERE email = '"+Userid+"' OR mobile_no = '"+Userid+"'  "
         connection.query(sql,(err,exist)=>{
             if(err){throw err }
@@ -40,11 +81,13 @@ const userco = {
                     if(hashPassword){
                         
                         if (validEmail(Userid)){
-                            sql = "INSERT INTO tbl_user (email,password) VALUE ('"+Userid+"','"+hashPassword+"')"
+                            sql = "INSERT INTO tbl_user (email,password,bname,account_type,blocation,mobile_no,country,fname,lname,name,main_contact_email,director1_name,director1_dob,director1_nationality,director2_name,director2_dob,director2_nationality, shareholder1_name,shareholder1_dob,shareholder1_nationality,shareholder2_name,shareholder2_dob,shareholder2_nationality,solution_apply_for_country,mode_of_solution) VALUE ('"+Userid+"','"+hashPassword+"','"+CompanyName+"','"+TradingAs+"','"+RegisteredAdd+"','"+CompanyNumber+"','"+Country+"','"+Fname+"','"+Lname+"','"+MainContact+"','"+MainEmail+"','"+FullName+"','"+DOB+"','"+Nationality+"','"+D2FullName+"','"+D2DOB+"','"+D2Nationality+"','"+SFullName+"','"+SDOB+"','"+SNationality+"','"+S2FullName+"','"+S2DOB+"','"+S2Nationality+"','"+SelectCountry+"','"+ModeofSolution+"')"
+
                         }
                     
                         if (validNumber(Userid)){
-                            sql = "INSERT INTO tbl_user (mobile_no,password) VALUE ('"+Userid+"','"+hashPassword+"')"
+                            sql = "INSERT INTO tbl_user (mobile_no,password,bname,account_type,blocation,mobile_no,country,fname,lname,name,main_contact_email,director1_name,director1_dob,director1_nationality,director2_name,director2_dob,director2_nationality, shareholder1_name,shareholder1_dob,shareholder1_nationality,shareholder2_name,shareholder2_dob,shareholder2_nationality,solution_apply_for_country,mode_of_solution) VALUE ('"+Userid+"','"+hashPassword+"','"+CompanyName+"','"+TradingAs+"','"+RegisteredAdd+"','"+CompanyNumber+"','"+Country+"','"+Fname+"','"+Lname+"','"+MainContact+"','"+MainEmail+"','"+FullName+"','"+DOB+"','"+Nationality+"','"+D2FullName+"','"+D2DOB+"','"+D2Nationality+"','"+SFullName+"','"+SDOB+"','"+SNationality+"','"+S2FullName+"','"+S2DOB+"','"+S2Nationality+"','"+SelectCountry+"','"+ModeofSolution+"')"
+
                         }
             
                         sql1 = "SELECT * FROM tbl_user WHERE email = '"+Userid+"' OR mobile_no = '"+Userid+"'"
@@ -69,6 +112,7 @@ const userco = {
 
             }
         })
+    }
         
     
         
@@ -247,12 +291,10 @@ const userco = {
             console.log(result)
             res.send(result)
         })
-            }
-        
+    
     },
 
 
-    //UPDATE
     recipt_setting: (req,res)=>{
         console.log("image upload")
         
@@ -352,11 +394,24 @@ const userco = {
         const Account_Holder = req.body.account_Holder 
         const Bank_Account = req.body.bank_Account
         const Bank_Routing = req.body.bank_Routing
+
+        sql = "INSERT INTO TABLENAME () VALUE ('"+ +"')"
+            connection.query(sql,(err,result)=>{
+                if(err){throw eresultrr}
+                if(result){
+                    console.log()
+                }
+            })
     
         
     },
 
-    //bussiness_setting:(req,res)=>{}
+    bussiness_alerts:(req,res)=>{
+        const BasicEmail = req.body.basicEmail;
+        const DisplaySocialMedia = req.body.displaySocialMedia
+
+        
+    },
 
     change_password: (req,res)=>{
         const Password = (req.body.password);
