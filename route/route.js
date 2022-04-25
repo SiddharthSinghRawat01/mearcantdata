@@ -1,8 +1,13 @@
 const express = require("express");
 const controller = require("../controler/userController");
 const path = require('path');
-const bodyParser = require("body-parser");
 const multer = require("multer");
+const cookieParser = require('cookie-parser');
+
+const route = express.Router();
+route.use(cookieParser())
+
+
 
 
 
@@ -21,15 +26,12 @@ const storage = multer.diskStorage({
 
 const upload = multer({storage: storage});
 
-const route = express.Router();
-route.use(bodyParser.urlencoded({extended: true}));
-route.use(bodyParser.json());
-
-route.get("/",(req,res)=>{
-    res.send("getting")
-})
 
 
+
+route.get("/gettransaction",controller.gettransaction);
+
+route.get("/gettransactionview",controller.gettransactionview);
 
 
 //register dashbord

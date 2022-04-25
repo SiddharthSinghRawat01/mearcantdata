@@ -1,10 +1,7 @@
 const path = require('path');
 const connection = require("../config/db_connection")
 const bcrypt = require("bcrypt");
-const bodyParser = require("body-parser");
-const multer = require("multer");
 const jwt = require('jsonwebtoken');
-const cookieParser = require('cookie-parser');
 
 var currentdate = new Date(); 
 var datetime =  currentdate.getDate() + "-"
@@ -22,6 +19,7 @@ const userco = {
 
     register: (req,res)=>{
         let Userid = req.body.userid;
+        const ConfirmUserid = req.body.confirmUserid
         const Password = req.body.password;
         const ConfirmPassword = req.body.confirmPassword;
         
@@ -66,16 +64,11 @@ const userco = {
             return formate.test(email);
         }
     
-        function validNumber(number){
-            const formate = /^\d{10}$/;
-            return formate.test(number);
-        }
-    
 
-        if(ConfirmPassword != Password){
-            console.log("password do not match")
+        if(ConfirmPassword != Password || ConfirmUserid != Userid){
+            console.log("password/userid is not same")
         }
-        if(ConfirmPassword === Password){
+        if(ConfirmPassword === Password || ConfirmUserid === Userid){
         const sql = "SELECT email,mobile_no FROM tbl_user WHERE email = '"+Userid+"' OR mobile_no = '"+Userid+"'  "
         connection.query(sql,(err,exist)=>{
             if(err){throw err }
@@ -91,12 +84,8 @@ const userco = {
                         if (validEmail(Userid)){
                             sql = "INSERT INTO tbl_user (email,password,bname,account_type,blocation,mobile_no,country,fname,lname,name,main_contact_email,director1_name,director1_dob,director1_nationality,director2_name,director2_dob,director2_nationality, shareholder1_name,shareholder1_dob,shareholder1_nationality,shareholder2_name,shareholder2_dob,shareholder2_nationality,solution_apply_for_country,mode_of_solution) VALUE ('"+Userid+"','"+hashPassword+"','"+CompanyName+"','"+TradingAs+"','"+RegisteredAdd+"','"+CompanyNumber+"','"+Country+"','"+Fname+"','"+Lname+"','"+MainContact+"','"+MainEmail+"','"+FullName+"','"+DOB+"','"+Nationality+"','"+D2FullName+"','"+D2DOB+"','"+D2Nationality+"','"+SFullName+"','"+SDOB+"','"+SNationality+"','"+S2FullName+"','"+S2DOB+"','"+S2Nationality+"','"+SelectCountry+"','"+ModeofSolution+"')"
 
-                        }
+                        
                     
-                        if (validNumber(Userid)){
-                            sql = "INSERT INTO tbl_user (mobile_no,password,bname,account_type,blocation,mobile_no,country,fname,lname,name,main_contact_email,director1_name,director1_dob,director1_nationality,director2_name,director2_dob,director2_nationality, shareholder1_name,shareholder1_dob,shareholder1_nationality,shareholder2_name,shareholder2_dob,shareholder2_nationality,solution_apply_for_country,mode_of_solution) VALUE ('"+Userid+"','"+hashPassword+"','"+CompanyName+"','"+TradingAs+"','"+RegisteredAdd+"','"+CompanyNumber+"','"+Country+"','"+Fname+"','"+Lname+"','"+MainContact+"','"+MainEmail+"','"+FullName+"','"+DOB+"','"+Nationality+"','"+D2FullName+"','"+D2DOB+"','"+D2Nationality+"','"+SFullName+"','"+SDOB+"','"+SNationality+"','"+S2FullName+"','"+S2DOB+"','"+S2Nationality+"','"+SelectCountry+"','"+ModeofSolution+"')"
-
-                        }
             
                         sql1 = "SELECT * FROM tbl_user WHERE email = '"+Userid+"' OR mobile_no = '"+Userid+"'"
                         connection.query(sql1,(err,foundUser,feilds)=>{
@@ -114,7 +103,10 @@ const userco = {
                                     }
                                 })
                             }
-                        })            
+                        })
+                    } else {
+                        console.log('email id not valid!')
+                    }           
                     }
                 })
 
@@ -241,7 +233,7 @@ const userco = {
         
     },
 
-    // feilds all not completed yet because of unknoen feilds 
+    // feilds all not completed yet because of unknown feilds 
     // PARTIALLY COMPLETED
     new_invoice: (req,res)=>{
     
@@ -256,17 +248,18 @@ const userco = {
         const Email = req.body.email;
         const Send = req.body.send;
         const DueDate = req.body.dueDate;
+        const merchant_id = foriginKey;
     
-        const sql = "SELECT * FROM tbl_user WHERE id = '"+foriginKey+"'";
-        connection.query(sql,(err,foundUser)=>{
-            if(err){throw err}
-            if(foundUser.length > 0){
+        // const sql = "SELECT * FROM tbl_user WHERE id = '"+foriginKey+"'";
+        // connection.query(sql,(err,foundUser)=>{
+        //     if(err){throw err}
+        //     if(foundUser.length > 0){
                 
                 let sql;
                 if(Taxable){
-                    sql = "Insert into  tbl_user_invoice (amount,invoice_no,description,currency,tax_amt,i_fname,i_lname,i_flname,i_email) VALUES ('"+Amount+"', '"+Invoice+"', '"+Description+"', '"+Currency+"', '"+TaxRate+"', '"+IFSC+"', '"+FirstName+"', '"+LastName+"', '"+FirstName+" "+LastName+"', '"+Email+"')" 
+                    sql = "Insert into  tbl_user_invoice (merchant_id,amount,invoice_no,description,currency,tax_amount,fname,lname,email) VALUES ('"+foriginKey+"','"+Amount+"', '"+Invoice+"', '"+Description+"', '"+Currency+"', '"+TaxRate+"', '"+FirstName+"', '"+LastName+"', '"+Email+"')" 
                 }else{
-                    sql = "Insert into  tbl_user_invoice (amount,invoice_no,description,currency,i_fname,i_lname,i_flname,i_email) VALUES ('"+Amount+"', '"+Invoice+"', '"+Description+"', '"+Currency+"','"+IFSC+"', '"+FirstName+"', '"+LastName+"', '"+FirstName+" "+LastName+"', '"+Email+"')"
+                    sql = "Insert into  tbl_user_invoice (merchant_id,amount,invoice_no,description,currency,fname,lname,email) VALUES ('"+foriginKey+"','"+Amount+"', '"+Invoice+"', '"+Description+"', '"+Currency+"', '"+FirstName+"', '"+LastName+"', '"+Email+"')"
                 }
                 
                 connection.query(sql,(err,result)=>{
@@ -278,8 +271,8 @@ const userco = {
                     }
                 });
 
-            }
-        })
+            // }
+        // })
     
         
      
@@ -509,7 +502,42 @@ const userco = {
             }
         })
     
+    },
+
+    gettransaction: (req,res)=>{
+       
+        let Pagination_id = 2;
+        let Start = Pagination_id*10-9
+        let End = Pagination_id*10
+
+
+        let sql = "SELECT * FROM tbl_merchant_transaction WHERE user_id = '15' AND invoice_id BETWEEN "+Start+" AND "+End+""
+        
+        connection.query(sql,(err,foundUser)=>{
+            if(err){throw err}
+            if(foundUser){
+                res.send(foundUser)
+                console.log(foundUser)
+            }
+        })
+    },
+
+    gettransactionview: (req,res)=>{
+  
+       
+        const sql = "SELECT * FROM tbl_merchant_transaction WHERE user_id = '4' AND invoice_id BETWEEN 44555556 AND 44555558"
+        
+        connection.query(sql,(err,foundUser)=>{
+            if(err){throw err}
+            if(foundUser){
+                res.send("gettransaction")
+                console.log(foundUser[0].invoice_id)
+            }
+        })
     }
+
+    
+
 
 
 
