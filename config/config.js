@@ -4,7 +4,7 @@ const config = {
     DB_PORT : "3000",
     DB_USERNAME : 'root',
     DB_PASSWORD : '',
-    DB_NAME : 'akonto.co',
+    DB_NAME : 'akonto_co',
 
 }
 
