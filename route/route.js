@@ -7,7 +7,7 @@ const cookieParser = require('cookie-parser');
 const route = express.Router();
 route.use(cookieParser())
 
-
+route.use("/route2",require("./2route"))
 
 
 

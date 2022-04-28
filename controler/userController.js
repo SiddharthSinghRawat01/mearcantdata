@@ -17,102 +17,109 @@ let foriginKey
 
 const userco = {
 
-    register: (req,res)=>{
-        let Userid = req.body.userid;
-        const ConfirmUserid = req.body.confirmUserid
-        const Password = req.body.password;
-        const ConfirmPassword = req.body.confirmPassword;
-        
-        // Company proile
-        const CompanyName = req.body.companyName; // bname
-        const TradingAs = req.body.tradingAs; // account_type
-        const RegisteredAdd = req.body.registeredAdd;  // blocation
-        const CompanyNumber = req.body.companyNumber; // mobile_no
-        const Country = req.body.country; // country
-        const Fname = req.body.fname; // fname
-        const Lname = req.body.lname; // lname
-        const MainContact =  Fname +" "+ Lname ;  //name
-        const MainEmail = req.body.mainEmail; // main_contact_email
-
-
-        // Directo's Info
-
-        const FullName = req.body.fullName; // director1_name
-        const DOB = req.body.dob; // director1_dob
-        const Nationality = req.body.nationality; // director1_nationality
-        const D2FullName = req.body.d2FullName; // director2_name
-        const D2DOB = req.body.d2dob; // director2_dob
-        const D2Nationality = req.body.d2Nationality; // director2_nationality
-        
-        // Share Holder Info
-
-        const SFullName = req.body.sfullName; // shareholder1_name
-        const SDOB = req.body.sdob; // shareholder1_dob
-        const SNationality = req.body.snationality; // shareholder1_nationality
-        const S2FullName = req.body.s2FullName; // shareholder2_name
-        const S2DOB = req.body.s2dob; //shareholder2_dob
-        const S2Nationality = req.body.s2Nationality; //shareholder2_nationality
-
+register: (req,res)=>{
+    let Userid = req.body.userid;
+    const ConfirmUserid = req.body.confirmUserid
+    const Password = req.body.password;
+    const ConfirmPassword = req.body.confirmPassword;
     
-        // Solutiion apply for
+    // Company proile
+    const CompanyName = req.body.companyName; // bname
+    const TradingAs = req.body.tradingAs; // account_type
+    const RegisteredAdd = req.body.registeredAdd;  // blocation
+    const CompanyNumber = req.body.companyNumber; // mobile_no
+    const Country = req.body.country; // country
+    // const Fname = req.body.fname; // fname
+    // const Lname = req.body.lname; // lname
+    const MainContact =  Fname +" "+ Lname ;  //name
+    const MainEmail = req.body.mainEmail; // main_contact_email
 
-        const SelectCountry = req.body.selectCountry; // solution_apply_for_country
-        const ModeofSolution = req.body.modeofSolution; // mode_of_solution
+    //NEW
+    // soluthon applying for country
 
-        function validEmail(email){
-            const formate = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-            return formate.test(email);
-        }
+    const SelectCountry = req.body.selectCountry; // solution_apply_for_country
+    const ModeofSolution = req.body.modeofSolution; // mode_of_solution
+
+    // Directo's Info
+
+    const FullName = req.body.fullName; // director1_name
+    const DOB = req.body.dob; // director1_dob
+    const Nationality = req.body.nationality; // director1_nationality
+    const D2FullName = req.body.d2FullName; // director2_name
+    const D2DOB = req.body.d2dob; // director2_dob
+    const D2Nationality = req.body.d2Nationality; // director2_nationality
     
+    // Share Holder Info
 
-        if(ConfirmPassword != Password || ConfirmUserid != Userid){
-            console.log("password/userid is not same")
-        }
-        if(ConfirmPassword === Password || ConfirmUserid === Userid){
-        const sql = "SELECT email,mobile_no FROM tbl_user WHERE email = '"+Userid+"' OR mobile_no = '"+Userid+"'  "
-        connection.query(sql,(err,exist)=>{
-            if(err){throw err }
-            if(exist.length >0){
-                console.log("user already exist")
-            } else {
-                
-                let sql = '';
-                bcrypt.hash(Password,8,(err,hashPassword)=>{
-                    if(err){throw err}
-                    if(hashPassword){
-                        
-                        if (validEmail(Userid)){
-                            sql = "INSERT INTO tbl_user (email,password,bname,account_type,blocation,mobile_no,country,fname,lname,name,main_contact_email,director1_name,director1_dob,director1_nationality,director2_name,director2_dob,director2_nationality, shareholder1_name,shareholder1_dob,shareholder1_nationality,shareholder2_name,shareholder2_dob,shareholder2_nationality,solution_apply_for_country,mode_of_solution) VALUE ('"+Userid+"','"+hashPassword+"','"+CompanyName+"','"+TradingAs+"','"+RegisteredAdd+"','"+CompanyNumber+"','"+Country+"','"+Fname+"','"+Lname+"','"+MainContact+"','"+MainEmail+"','"+FullName+"','"+DOB+"','"+Nationality+"','"+D2FullName+"','"+D2DOB+"','"+D2Nationality+"','"+SFullName+"','"+SDOB+"','"+SNationality+"','"+S2FullName+"','"+S2DOB+"','"+S2Nationality+"','"+SelectCountry+"','"+ModeofSolution+"')"
+    const SFullName = req.body.sfullName; // shareholder1_name
+    const SDOB = req.body.sdob; // shareholder1_dob
+    const SNationality = req.body.snationality; // shareholder1_nationality
+    const S2FullName = req.body.s2FullName; // shareholder2_name
+    const S2DOB = req.body.s2dob; //shareholder2_dob
+    const S2Nationality = req.body.s2Nationality; //shareholder2_nationality
 
-                        
-                    
+    //////////////// company pofile new
+
+    // Website / Processing URL
+    // Nature of Business
+    // Estimated Monthly Volume per Market (in USD) 
+    // Average Ticket Size (in USD)
+
+    //////////////company porfile
+    // Settelment Info
+    // Crypto Wallet Address (Optional)
+
+
+    function validEmail(email){
+        const formate = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        return formate.test(email);
+    }
+
+
+    if(ConfirmPassword != Password || ConfirmUserid != Userid){
+        console.log("password/userid is not same")
+    }
+    if(ConfirmPassword === Password || ConfirmUserid === Userid){
+    const sql = "SELECT email,mobile_no FROM tbl_user WHERE email = '"+Userid+"' OR mobile_no = '"+Userid+"'  "
+    connection.query(sql,(err,exist)=>{
+    if(err){throw err }
+    if(exist.length >0){
+        console.log("user already exist")
+    } else {
+        
+    bcrypt.hash(Password,8,(err,hashPassword)=>{
+        if(err){throw err}
+        if(hashPassword){
             
-                        sql1 = "SELECT * FROM tbl_user WHERE email = '"+Userid+"' OR mobile_no = '"+Userid+"'"
-                        connection.query(sql1,(err,foundUser,feilds)=>{
-                            if(err){throw err}
-                            if(foundUser.length > 0){
-                                console.log("user found")
-                    
-                            }else{
-                                console.log("not found user")
-                                connection.query(sql,(err,result)=>{
-                                    if(err){throw err} 
-                                    else {
-                                        console.log(result)
-                                        
-                                    }
-                                })
-                            }
-                        })
-                    } else {
-                        console.log('email id not valid!')
-                    }           
+        if (validEmail(Userid)){    
+
+        let sql = "SELECT * FROM tbl_user WHERE email = '"+Userid+"' OR mobile_no = '"+Userid+"'"
+        connection.query(sql,(err,foundUser,feilds)=>{
+            if(err){throw err}
+            if(foundUser.length > 0){
+                console.log("user found")
+    
+            }else{
+                console.log("not found user")
+                let sql = "INSERT INTO tbl_user (email,password,bname,account_type,blocation,mobile_no,country,fname,lname,name,main_contact_email,director1_name,director1_dob,director1_nationality,director2_name,director2_dob,director2_nationality, shareholder1_name,shareholder1_dob,shareholder1_nationality,shareholder2_name,shareholder2_dob,shareholder2_nationality,solution_apply_for_country,mode_of_solution) VALUE ('"+Userid+"','"+hashPassword+"','"+CompanyName+"','"+TradingAs+"','"+RegisteredAdd+"','"+CompanyNumber+"','"+Country+"','"+Fname+"','"+Lname+"','"+MainContact+"','"+MainEmail+"','"+FullName+"','"+DOB+"','"+Nationality+"','"+D2FullName+"','"+D2DOB+"','"+D2Nationality+"','"+SFullName+"','"+SDOB+"','"+SNationality+"','"+S2FullName+"','"+S2DOB+"','"+S2Nationality+"','"+SelectCountry+"','"+ModeofSolution+"')"
+                connection.query(sql,(err,result)=>{
+                    if(err){throw err} 
+                    else {
+                        console.log(result)
+
                     }
                 })
-
             }
         })
+    } else {
+            console.log('email id not valid!')
+        }           
+        }
+    })
+
     }
+    })
+}
         
     
         
@@ -125,48 +132,48 @@ const userco = {
     
         // email mobile no. validation
     
-        sql = "SELECT * FROM tbl_user WHERE email = '"+Userid+ "' OR mobile_no = '"+Userid+"'"
-        connection.query(sql,(err,foundUser)=>{
-            if(err){throw err}
-            if(foundUser.length > 0){
-                console.log()
-                bcrypt.compare(Password,foundUser[0].password,(err,passwordMatch)=>{
-                    if(err){throw err}
-                    if(!passwordMatch){
-                        console.log("incorrect passsword")
-                        // res.redirect("/login")
-                    }
-                    if(passwordMatch){
-                        console.log("password match")
-                        // MADE FEILD FOR JWT TOKEN
-                        let token = jwt.sign({user: '123'}, 'SECRET')
-                        const coo = res.cookie('name', token) //Sets name = express
+sql = "SELECT * FROM tbl_user WHERE email = '"+Userid+ "' OR mobile_no = '"+Userid+"'"
+connection.query(sql,(err,foundUser)=>{
+    if(err){throw err}
+    if(foundUser.length > 0){
+    console.log()
+    bcrypt.compare(Password,foundUser[0].password,(err,passwordMatch)=>{
+        if(err){throw err}
+        if(!passwordMatch){
+            console.log("incorrect passsword")
+            // res.redirect("/login")
+        }
+        if(passwordMatch){
+            console.log("password match")
+            // MADE FEILD FOR JWT TOKEN
+            let token = jwt.sign({user: '123'}, 'SECRET')
+            const coo = res.cookie('name', token) //Sets name = express
 
-                        console.log('Cookies: ', req.cookies);
-                        // let header = res.set("id", foundUser[0].id);
-                        // console.log("//")
-                        // console.log(res.getHeader("id"));
-    
-                        foriginKey = foundUser[0].id
-                        console.log(foriginKey)
-    
-                        sql = "UPDATE tbl_user set verification_token = '"+token+"' where name = '"+foundUser[0].email+"' OR mobile_no = '"+foundUser[0].mobile_no+"'"
-                        connection.query(sql,(err,update,feilds)=>{
-                            if (err){throw err}
-                            if(update){
-                                console.log("12341")
-                                console.log(foundUser[0].fname)
-                                console.log("updated!!")                            
-                            }
-                        })
-                    }
-    
-                })
-    
-            }else{
-                console.log("you shoud register")
-                // res.redirect("/register")
-            }
+            console.log('Cookies: ', req.cookies);
+            // let header = res.set("id", foundUser[0].id);
+            // console.log("//")
+            // console.log(res.getHeader("id"));
+
+            foriginKey = foundUser[0].id
+            console.log(foriginKey)
+
+            sql = "UPDATE tbl_user set verification_token = '"+token+"' where name = '"+foundUser[0].email+"' OR mobile_no = '"+foundUser[0].mobile_no+"'"
+            connection.query(sql,(err,update,feilds)=>{
+                if (err){throw err}
+                if(update){
+                    console.log("12341")
+                    console.log(foundUser[0].fname)
+                    console.log("updated!!")                            
+                }
+            })
+        }
+
+    })
+
+    }else{
+        console.log("you shoud register")
+        // res.redirect("/register")
+    }
         })
     },
 
