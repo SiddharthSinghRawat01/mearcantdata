@@ -24,6 +24,18 @@ const upload = multer({storage: storage});
 
 console.log('working///////////////////////////')
 
-route.post("/register",upload.none(),controller.register)
+route.post("/register",upload.none(),controller.register);
+
+route.post("/dataregister_1",upload.none(),controller.dataregister_1);
+
+route.post("/dataregister_2",upload.none(),controller.dataregister_2);
+
+route.post("/dataregister_3",upload.none(),controller.dataregister_3);
+
+route.post("/dataregister_4",upload.none(),controller.dataregister_4);
+
+route.post("/dataregister_5",upload.none(),controller.dataregister_5);
+
+route.post("/dataregister_6",upload.none(),controller.dataregister_5);
 
 module.exports = route
