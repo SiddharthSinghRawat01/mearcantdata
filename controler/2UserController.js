@@ -2,6 +2,8 @@ const path = require('path');
 const connection = require("../config/db_connection")
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
+const { route } = require('../route/2route');
 const saltRound = 8 ;
 
 
@@ -13,6 +15,32 @@ let validEmail = function(Email){
 let Check = (index,confirmIndex)=>{
     let match = index === confirmIndex;
     return match
+}
+
+const mail = (b)=>{
+    let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+    user: 'siddharthsinghrawat01@gmail.com',
+    pass: '*****'
+    }
+    });
+
+    let mailOptions = {
+    from: 'siddharthsinghrawat01@gmail.com',
+    to: 'itsrawatsingh@gmail.com',
+    subject: 'Sending Email using Node.js',
+    text: 'That was easy!'
+    };
+
+    transporter.sendMail(mailOptions, function(error, info){
+    if (error) {
+    console.log("//////////////////////////")
+    console.log(error);
+    } else {
+    console.log('Email sent: ' + info.response);
+    }
+});
 }
 
 
@@ -52,6 +80,8 @@ if(validEmail(Email)){
         let token = jwt.sign({user: '123'}, 'SECRET');
         console.log(token)
         res.cookie('user id', token);
+
+        mail(Email);
 
         let sql = "INSERT INTO tbl_user (email,password,verification_token) VALUE ('"+Email+"','"+Password+"','"+token+"')"
         connection.query(sql,(err,inserted)=>{
@@ -191,6 +221,42 @@ dataregister_6 : (req,res)=>{
     if(update){
         console.log(update)
     }
+    });
+
+},
+
+verify: (req,res)=>{
+    const Email = req.body.email;
+    /// button will be used at at front end
+
+    let sql = "UPDATE tbl_user SET email_verification = '1' WHERE email = '"+Email+"'"
+    connection.query(sql,(err,update)=>{
+    if(err){throw err}
+    if(update){
+        console.log(update)
+    }
+    });
+
+},
+
+changePassword: (req,res)=>{
+    const Email = req.body.email;
+    
+    const NewPassword = req.body.newPassword
+
+    bcrypt.hash(NewPassword,saltRound,(err,hashPassword)=>{
+        if(err){throw err}
+        if(hashPassword){
+            let sql = "UPDATE tbl_user SET password = '"+hashPassword+"' WHERE email = '"+Email+"'";
+            connection.query(sql,(err,update)=>{
+                if(err){throw err}
+                if(update){
+                console.log(update)
+                }
+            });
+
+        }
+
     });
 
 }
