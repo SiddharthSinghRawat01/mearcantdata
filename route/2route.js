@@ -2,10 +2,8 @@ const express = require("express");
 const controller = require("../controler/2UserController");
 const path = require('path');
 const multer = require("multer");
-const cookieParser = require('cookie-parser');
 
 const route = express.Router();
-route.use(cookieParser())
 
 
 const storage = multer.diskStorage({
@@ -22,7 +20,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({storage: storage});
 
-console.log('working///////////////////////////')
+route.get("/",controller.get);
 
 route.post("/register",upload.none(),controller.register);
 
