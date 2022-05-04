@@ -3,7 +3,6 @@ const connection = require("../config/db_connection")
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
-const { route } = require('../route/2route');
 const saltRound = 8 ;
 
 
@@ -17,30 +16,97 @@ let Check = (index,confirmIndex)=>{
     return match
 }
 
-const mail = (b)=>{
-    let transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-    user: 'siddharthsinghrawat01@gmail.com',
-    pass: '*****'
-    }
+let mail = function(emailid) {
+    let mailTransporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'rampraveshsingh1996@gmail.com',
+            pass: 'PpppP12345'
+        }
     });
 
-    let mailOptions = {
-    from: 'siddharthsinghrawat01@gmail.com',
-    to: 'itsrawatsingh@gmail.com',
-    subject: 'Sending Email using Node.js',
-    text: 'That was easy!'
+    let mailDetails = {
+        from: 'rampraveshsingh1996@gmail.com',
+        to: emailid,
+        subject: 'Test mail',
+        html: `
+        <div class="maincon">
+    <style>
+.maincon{
+    text-align: center;
+}
+.con1{
+    background-color: rgb(16,71,153);
+    color:rgb(229,234,245);
+    padding:25px;
+}
+img{
+    color:black;
+}
+.img1{
+    margin:20px;
+    height: 60px;
+    width:200px;
+}
+.con2{
+    margin:40px;
+    line-height: 25px; 
+    font-size: 19px;
+}
+.btn{
+    background-color: rgb(250,104,56);
+    border: transparent;
+    padding: 10px 30px;
+    font-weight: bold;
+    font-size: 19px;
+        color:rgb(229,234,245);
+
+}
+span{
+    font-size: 18px;
+}
+.con3{
+    background-color: rgb(229,234,245);
+}
+.foot{
+    background-color: rgb(16,71,153);
+    color:rgb(229,234,245);
+    padding: 20px;
+}
+.img2{
+    height: 60px;
+}
+
+</style>
+<div><img src="https://i.ibb.co/CWHvXbP/im2.png" alt="IMAGE" class="img1"></div>
+    <div class="con1">
+        <img src="https://i.ibb.co/Q9LDRH4/im1.png" alt="IMAGE" class="img2">
+        <h3>THANKS FOR SIGNING UP!</h3>
+        <h1>Varify your E-mail Address</h1>
+    </div>
+    <br>
+    <div class="con2">Hi,<br>Please click on the button below to varify your email address</div>
+    <button class="btn">VARIFY YOUR EMAIL</button><br><br><br><br>
+    <span>Thanks</span><br><br><br><br>
+    <div class="con3">
+        <br><br>
+        <div>support@ubankconnect.com</div>
+        <br><br><br>
+        <div class="foot">Copyrights © U Bank Connect. All Rights Reserved</div>
+    </div>
+</div>
+        `
     };
 
-    transporter.sendMail(mailOptions, function(error, info){
-    if (error) {
-    console.log("//////////////////////////")
-    console.log(error);
-    } else {
-    console.log('Email sent: ' + info.response);
-    }
-});
+    mailTransporter.sendMail(mailDetails, function (err, data) {
+        if (err) {
+            console.log('Error Occurs');
+            console.log(err);
+        } else {
+            console.log('Email sent successfully');
+            res.send("Email sent successfully")
+        }
+    });
 }
 
 
@@ -245,17 +311,17 @@ changePassword: (req,res)=>{
     const NewPassword = req.body.newPassword
 
     bcrypt.hash(NewPassword,saltRound,(err,hashPassword)=>{
-        if(err){throw err}
-        if(hashPassword){
-            let sql = "UPDATE tbl_user SET password = '"+hashPassword+"' WHERE email = '"+Email+"'";
-            connection.query(sql,(err,update)=>{
-                if(err){throw err}
-                if(update){
-                console.log(update)
-                }
-            });
+    if(err){throw err}
+    if(hashPassword){
+        let sql = "UPDATE tbl_user SET password = '"+hashPassword+"' WHERE email = '"+Email+"'";
+        connection.query(sql,(err,update)=>{
+            if(err){throw err}
+            if(update){
+            console.log(update)
+            }
+        });
 
-        }
+    }
 
     });
 
