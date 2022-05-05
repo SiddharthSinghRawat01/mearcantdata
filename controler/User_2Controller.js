@@ -119,13 +119,13 @@ get:(req,res)=>{
     res.send("<h1>Home</h1>")
 },    
 
-register: (req,res)=>{
-    
+register: async (req,res)=>{
+ try {
+        
 const Email = req.body.email;
 const ConfirmEmail = req.body.confirmEmail;
 const Password = req.body.password;
 const ConfirmPassword = req.body.confirmPassword
-
 
 if(!validEmail(Email)){
     // redirect to sign up page
@@ -138,28 +138,25 @@ if(validEmail(Email)){
     if(Check(Email,ConfirmEmail) && Check(Password,ConfirmPassword)){
         console.log("working")
 
-    bcrypt.hash(Password,saltRound,(err,hashPassword)=>{
-        if(err){throw err}
+    let hashPassword = await bcrypt.hash(Password,saltRound)
+
         if(hashPassword){
             console.log (hashPassword)
 
-        let token = jwt.sign({user: Email}, 'SECRET');
+        let token = await jwt.sign({user: Email}, 'SECRET');
         console.log(token)
         res.cookie('user id', token);
         
         console.log("///////////////")
         
-
-        // mail(Email);  
-
+        mail(Email);  
 
         let sql = "INSERT INTO tbl_user (email,password,verification_token) VALUE ('"+Email+"','"+hashPassword+"','"+token+"')"
-        connection.query(sql,(err,inserted)=>{
-            if(err){throw err}
+        let inserted = await connection.query(sql);
             if(inserted){
                 console.log(inserted)
             }
-        });
+        
 
         return res.json(200,{
             message: "Take your tokem",
@@ -170,13 +167,14 @@ if(validEmail(Email)){
 
         } 
         
-    });
-
     }else{
         return console.log("not working")
     }
 
 }
+ } catch (error) {
+    console.log('ERROR',error);
+ }
 
 
 },
@@ -203,6 +201,7 @@ dataregister_1 : async (req,res)=>{
     let update = await connection.query(sql);
 
     return console.log("update");
+
     } catch (error) {
         console.log('ERROR',error);
     }
@@ -210,24 +209,29 @@ dataregister_1 : async (req,res)=>{
    
 },
 
-dataregister_2 : (req,res)=>{
-    const Email = req.body.email;
+dataregister_2 : async (req,res)=>{
+    try {
+    let Payload = await jwt.verify(req.params.id, 'SECRET');
 
     // soluthon applying for country
     const SelectCountry = req.body.selectCountry; // solution_apply_for_country
     const ModeofSolution = req.body.modeofSolution; // mode_of_solution
 
-    let sql = "UPDATE tbl_user SET solution_apply_for_country = '"+SelectCountry+"', mode_of_solution = '"+ModeofSolution+"' WHERE email = '"+Email+"'"
-    connection.query(sql,(err,update)=>{
-    if(err){throw err}
-    if(update){
-        console.log(update)
+    let sql = "UPDATE tbl_user SET solution_apply_for_country = '"+SelectCountry+"', mode_of_solution = '"+ModeofSolution+"' WHERE email = '"+Payload.user+"'"
+    let update = await connection.query(sql);
+
+    return console.log("update");
+        
+    } catch (error) {
+        console.log('ERROR',error);
     }
-    });
+
+    
 
 },
-dataregister_3 : (req,res)=>{
-    const Email = req.body.email;
+dataregister_3 : async (req,res)=>{
+    try {
+    let Payload = await jwt.verify(req.params.id, 'SECRET');
 
     // Directo's Info
 
@@ -238,17 +242,20 @@ dataregister_3 : (req,res)=>{
     const D2dob = req.body.d2dob; // director2_dob
     const D2Nationality = req.body.d2Nationality; // director2_nationality
     
-    let sql = "UPDATE tbl_user SET director1_name ='"+DFullName+"', director1_dob ='"+Dob+"',director1_nationality ='"+Nationality+"',director2_name ='"+D2FullName+"',director2_dob ='"+D2dob+"',director2_nationality ='"+D2Nationality+"' WHERE email = '"+Email+"'"
-    connection.query(sql,(err,update)=>{
-    if(err){throw err}
-    if(update){
-        console.log(update)
+    let sql = "UPDATE tbl_user SET director1_name ='"+DFullName+"', director1_dob ='"+Dob+"',director1_nationality ='"+Nationality+"',director2_name ='"+D2FullName+"',director2_dob ='"+D2dob+"',director2_nationality ='"+D2Nationality+"' WHERE email = '"+Payload.user+"'"
+    let update = await connection.query(sql);
+
+    return console.log("update");
+        
+    } catch (error) {
+        console.log('ERROR',error);
     }
-    });
+    
 },
 
-dataregister_4 : (req,res)=>{
-    const Email = req.body.email;
+dataregister_4 : async (req,res)=>{
+    try {
+    let Payload = await jwt.verify(req.params.id, 'SECRET');
 
     // Share Holder Info
 
@@ -259,17 +266,20 @@ dataregister_4 : (req,res)=>{
     const S2dob = req.body.s2dob; //shareholder2_dob
     const S2Nationality = req.body.s2Nationality; //shareholder2_nationality
 
-    let sql = "UPDATE tbl_user SET shareholder1_name ='"+SFullName+"', shareholder1_dob ='"+SDob+"',shareholder1_nationality ='"+SNationality+"',shareholder2_name ='"+S2FullName+"',shareholder2_dob ='"+S2dob+"',shareholder2_nationality ='"+S2Nationality+"' WHERE email = '"+Email+"'"
-    connection.query(sql,(err,update)=>{
-    if(err){throw err}
-    if(update){
-        console.log(update)
+    let sql = "UPDATE tbl_user SET shareholder1_name ='"+SFullName+"', shareholder1_dob ='"+SDob+"',shareholder1_nationality ='"+SNationality+"',shareholder2_name ='"+S2FullName+"',shareholder2_dob ='"+S2dob+"',shareholder2_nationality ='"+S2Nationality+"' WHERE email = '"+Payload.user+"'"
+    let update = await connection.query(sql);
+
+    return console.log("update");
+
+    } catch (error) {
+        console.log('ERROR',error);
     }
-    });
+    
 },
 
-dataregister_5 : (req,res)=>{
-    const Email = req.body.email;
+dataregister_5 : async (req,res)=>{
+    try {
+        let Payload = await jwt.verify(req.params.id, 'SECRET');
     // company Profile
 
     const Website = req.body.website;
@@ -277,19 +287,22 @@ dataregister_5 : (req,res)=>{
     const MontthlyVolume = req.body.montthlyVolume;
     const AverageTicketSize = req.body.averageTicketSize;
 
-    let sql = "UPDATE tbl_user SET website ='"+Website+"', job_title ='"+NatureOfBusiness+"', company_estimated_monthly_volume ='"+MontthlyVolume+"',company_avarage_ticket_size ='"+AverageTicketSize+"' WHERE email = '"+Email+"'"
-    connection.query(sql,(err,update)=>{
-    if(err){throw err}
-    if(update){
-        console.log(update)
+    let sql = "UPDATE tbl_user SET website ='"+Website+"', job_title ='"+NatureOfBusiness+"', company_estimated_monthly_volume ='"+MontthlyVolume+"',company_avarage_ticket_size ='"+AverageTicketSize+"' WHERE email = '"+Payload.user+"'"
+    let update = await connection.query(sql);
+
+    return console.log("update");
+    } catch (error) {
+        console.log('ERROR',error);
     }
-    });
+    
 
 },
 
-dataregister_6 : (req,res)=>{
-    const Email = req.body.email;
+dataregister_6 : async (req,res)=>{
+    try {
+        let Payload = await jwt.verify(req.params.id, 'SECRET');
     //company porfile
+    console.log(Payload)
 
     const SettelmentInfo = req.body.settelmentInfo;
     const WalletAddress = req.body.walletAddress;
@@ -297,15 +310,17 @@ dataregister_6 : (req,res)=>{
     // Settelment Info
     // Crypto Wallet Address (Optional)
 
-    let sql = "UPDATE tbl_user SET settle_currenct ='"+SettelmentInfo+"', wallet ='"+WalletAddress+"' WHERE email = '"+Email+"'"
-    connection.query(sql,(err,update)=>{
-    if(err){throw err}
-    if(update){
-        console.log(update)
+    let sql = "UPDATE tbl_user SET settle_currency ='"+SettelmentInfo+"', wallet ='"+WalletAddress+"' WHERE email = '"+Payload.user+"'"
+    let update = await connection.query(sql);
+
+    return console.log("update_6");
+    } catch (error) {
+        console.log('ERROR',error);
     }
-    });
+    
 
 },
+/////////////////////////////////////diffferent////////////////////////////////////////
 
 verify: (req,res)=>{
     const Email = req.body.email;
