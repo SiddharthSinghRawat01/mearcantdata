@@ -150,7 +150,7 @@ if(validEmail(Email)){
         console.log("///////////////")
         
 
-        // mail(Email);
+        // mail(Email);  
 
 
         let sql = "INSERT INTO tbl_user (email,password,verification_token) VALUE ('"+Email+"','"+hashPassword+"','"+token+"')"
