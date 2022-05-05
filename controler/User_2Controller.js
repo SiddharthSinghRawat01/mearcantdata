@@ -143,13 +143,17 @@ if(validEmail(Email)){
         if(hashPassword){
             console.log (hashPassword)
 
-        let token = jwt.sign({user: '123'}, 'SECRET');
+        let token = jwt.sign({user: Email}, 'SECRET');
         console.log(token)
         res.cookie('user id', token);
+        
+        console.log("///////////////")
+        
 
-        mail(Email);
+        // mail(Email);
 
-        let sql = "INSERT INTO tbl_user (email,password,verification_token) VALUE ('"+Email+"','"+Password+"','"+token+"')"
+
+        let sql = "INSERT INTO tbl_user (email,password,verification_token) VALUE ('"+Email+"','"+hashPassword+"','"+token+"')"
         connection.query(sql,(err,inserted)=>{
             if(err){throw err}
             if(inserted){
@@ -157,7 +161,15 @@ if(validEmail(Email)){
             }
         });
 
+        return res.json(200,{
+            message: "Take your tokem",
+            data: {
+                token: token
+            }
+        })
+
         } 
+        
     });
 
     }else{
@@ -169,8 +181,11 @@ if(validEmail(Email)){
 
 },
 
-dataregister_1 : (req,res)=>{
-    const Email = req.body.email;
+dataregister_1 : async (req,res)=>{
+
+    try {
+        let Payload = await jwt.verify(req.params.id, 'SECRET');
+    
 
     // Company proile
     const CompanyName = req.body.companyName; // bname
@@ -184,14 +199,15 @@ dataregister_1 : (req,res)=>{
     const MainEmail = req.body.mainEmail; // main_contact_email
 
 
-    let sql = "UPDATE tbl_user SET bname = '"+CompanyName+"', account_type = '"+TradingAs+"', blocation = '"+RegisteredAdd+"', mobile_no = '"+CompanyNumber+"', country = '"+Country+"', fname = '"+Fname+"', lname = '"+Lname+"', name = '"+MainContact+"', main_contact_email = '"+MainEmail+"' WHERE email = '"+Email+"'"
-    connection.query(sql,(err,update)=>{
-    if(err){throw err}
-    if(update){
-        console.log(update)
-    }
-    });
+    let sql = "UPDATE tbl_user SET bname = '"+CompanyName+"', account_type = '"+TradingAs+"', blocation = '"+RegisteredAdd+"', mobile_no = '"+CompanyNumber+"', country = '"+Country+"', fname = '"+Fname+"', lname = '"+Lname+"', name = '"+MainContact+"', main_contact_email = '"+MainEmail+"' WHERE email = '"+Payload.user+"'"
+    let update = await connection.query(sql);
 
+    return console.log("update");
+    } catch (error) {
+        console.log('ERROR',error);
+    }
+
+   
 },
 
 dataregister_2 : (req,res)=>{

@@ -9,15 +9,6 @@ app.use(express.urlencoded());
 
 app.use(cookieParser());
 
-app.use(session({
-    secret: 'keyboard cat',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        maxAge: (1000*60*100)
-    }
-  }));
-
 app.use(require("./route/route"));
 
 

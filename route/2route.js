@@ -1,5 +1,5 @@
 const express = require("express");
-const controller = require("../controler/2UserController");
+const controller = require("../controler/User_2Controller");
 const path = require('path');
 const multer = require("multer");
 
@@ -24,7 +24,7 @@ route.get("/",controller.get);
 
 route.post("/register",upload.none(),controller.register);
 
-route.post("/dataregister_1",upload.none(),controller.dataregister_1);
+route.post("/dataregister_1/:id",upload.none(),controller.dataregister_1);
 
 route.post("/dataregister_2",upload.none(),controller.dataregister_2);
 
