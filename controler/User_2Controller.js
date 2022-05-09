@@ -16,7 +16,7 @@ let Check = (index,confirmIndex)=>{
     return match
 }
 
-let mail = function(emailid) {
+let mail = function(email,token) {
     let mailTransporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -27,75 +27,9 @@ let mail = function(emailid) {
 
     let mailDetails = {
         from: 'rampraveshsingh1996@gmail.com',
-        to: emailid,
+        to: email,
         subject: 'Test mail',
-        html: `
-        <div class="maincon">
-    <style>
-.maincon{
-    text-align: center;
-}
-.con1{
-    background-color: rgb(16,71,153);
-    color:rgb(229,234,245);
-    padding:25px;
-}
-img{
-    color:black;
-}
-.img1{
-    margin:20px;
-    height: 60px;
-    width:200px;
-}
-.con2{
-    margin:40px;
-    line-height: 25px; 
-    font-size: 19px;
-}
-.btn{
-    background-color: rgb(250,104,56);
-    border: transparent;
-    padding: 10px 30px;
-    font-weight: bold;
-    font-size: 19px;
-        color:rgb(229,234,245);
-
-}
-span{
-    font-size: 18px;
-}
-.con3{
-    background-color: rgb(229,234,245);
-}
-.foot{
-    background-color: rgb(16,71,153);
-    color:rgb(229,234,245);
-    padding: 20px;
-}
-.img2{
-    height: 60px;
-}
-
-</style>
-<div><img src="https://i.ibb.co/CWHvXbP/im2.png" alt="IMAGE" class="img1"></div>
-    <div class="con1">
-        <img src="https://i.ibb.co/Q9LDRH4/im1.png" alt="IMAGE" class="img2">
-        <h3>THANKS FOR SIGNING UP!</h3>
-        <h1>Varify your E-mail Address</h1>
-    </div>
-    <br>
-    <div class="con2">Hi,<br>Please click on the button below to varify your email address</div>
-    <button class="btn">VARIFY YOUR EMAIL</button><br><br><br><br>
-    <span>Thanks</span><br><br><br><br>
-    <div class="con3">
-        <br><br>
-        <div>support@ubankconnect.com</div>
-        <br><br><br>
-        <div class="foot">Copyrights © U Bank Connect. All Rights Reserved</div>
-    </div>
-</div>
-        `
+        html: nodemailer.renderTemplate({email : email, token : token}, '../views/sent_mail.ejs')
     };
 
     mailTransporter.sendMail(mailDetails, function (err, data) {
@@ -141,27 +75,21 @@ if(validEmail(Email)){
     let hashPassword = await bcrypt.hash(Password,saltRound)
 
         if(hashPassword){
-            console.log (hashPassword)
-
-        let token = await jwt.sign({user: Email}, 'SECRET');
-        console.log(token)
-        res.cookie('user id', token);
-        
-        console.log("///////////////")
-        
-        mail(Email);  
 
         let sql = "INSERT INTO tbl_user (email,password,verification_token) VALUE ('"+Email+"','"+hashPassword+"','"+token+"')"
         let inserted = await connection.query(sql);
-            if(inserted){
-                console.log(inserted)
-            }
+        if(inserted){
+            let token = await jwt.sign({user: Email}, 'SECRET');
+            let mail = await mail(Email,token); 
+            console.log(inserted)
+
+        }
         
 
-        return res.json(200,{
+        return res.send(200,{
             message: "Take your tokem",
             data: {
-                token: token
+
             }
         })
 
@@ -182,25 +110,31 @@ if(validEmail(Email)){
 dataregister_1 : async (req,res)=>{
 
     try {
-        let Payload = await jwt.verify(req.params.id, 'SECRET');
+    
+    const key = req.body.key
     
 
     // Company proile
     const CompanyName = req.body.companyName; // bname
-    const TradingAs = req.body.tradingAs; // account_type
-    const RegisteredAdd = req.body.registeredAdd;  // blocation
+    const TradingAs = req.body.tradingDoing; // job_title
+    const RegisteredAdd = req.body.registeredAddress;  // blocation
     const CompanyNumber = req.body.companyNumber; // mobile_no
-    const Country = req.body.country; // country
-    const Fname = req.body.fname; // fname
-    const Lname = req.body.lname; // lname
-    const MainContact =  Fname +" "+ Lname ;  //name
-    const MainEmail = req.body.mainEmail; // main_contact_email
+    const Country = req.body.countryofIncorporation; // country
+    // const Fname = req.body.fname; // fname
+    // const Lname = req.body.lname; // lname
+    const MainContact =  req.body.mainContactPerson ;  //name
+    const MainEmail = req.body.mainContactEmailAddress; // main_contact_email
 
 
-    let sql = "UPDATE tbl_user SET bname = '"+CompanyName+"', account_type = '"+TradingAs+"', blocation = '"+RegisteredAdd+"', mobile_no = '"+CompanyNumber+"', country = '"+Country+"', fname = '"+Fname+"', lname = '"+Lname+"', name = '"+MainContact+"', main_contact_email = '"+MainEmail+"' WHERE email = '"+Payload.user+"'"
+    console.log(key,CompanyName,TradingAs,RegisteredAdd,CompanyNumber,Country);
+
+    let sql = "UPDATE tbl_user SET bname = '"+CompanyName+"', job_title = '"+TradingAs+"', blocation = '"+RegisteredAdd+"', mobile_no = '"+CompanyNumber+"', country = '"+Country+"', name = '"+MainContact+"', main_contact_email = '"+MainEmail+"' WHERE email = '"+key+"'"
     let update = await connection.query(sql);
 
-    return console.log("update");
+    return res.send(200,{
+        message: "Update"
+    })
+
 
     } catch (error) {
         console.log('ERROR',error);
@@ -211,13 +145,12 @@ dataregister_1 : async (req,res)=>{
 
 dataregister_2 : async (req,res)=>{
     try {
-    let Payload = await jwt.verify(req.params.id, 'SECRET');
-
+        const key = req.body.key;
     // soluthon applying for country
     const SelectCountry = req.body.selectCountry; // solution_apply_for_country
     const ModeofSolution = req.body.modeofSolution; // mode_of_solution
 
-    let sql = "UPDATE tbl_user SET solution_apply_for_country = '"+SelectCountry+"', mode_of_solution = '"+ModeofSolution+"' WHERE email = '"+Payload.user+"'"
+    let sql = "UPDATE tbl_user SET solution_apply_for_country = '"+SelectCountry+"', mode_of_solution = '"+ModeofSolution+"' WHERE email = '"+key+"'"
     let update = await connection.query(sql);
 
     return console.log("update");
@@ -231,8 +164,7 @@ dataregister_2 : async (req,res)=>{
 },
 dataregister_3 : async (req,res)=>{
     try {
-    let Payload = await jwt.verify(req.params.id, 'SECRET');
-
+        const key = req.body.key;
     // Directo's Info
 
     const DFullName = req.body.dfullName; // director1_name
@@ -242,7 +174,7 @@ dataregister_3 : async (req,res)=>{
     const D2dob = req.body.d2dob; // director2_dob
     const D2Nationality = req.body.d2Nationality; // director2_nationality
     
-    let sql = "UPDATE tbl_user SET director1_name ='"+DFullName+"', director1_dob ='"+Dob+"',director1_nationality ='"+Nationality+"',director2_name ='"+D2FullName+"',director2_dob ='"+D2dob+"',director2_nationality ='"+D2Nationality+"' WHERE email = '"+Payload.user+"'"
+    let sql = "UPDATE tbl_user SET director1_name ='"+DFullName+"', director1_dob ='"+Dob+"',director1_nationality ='"+Nationality+"',director2_name ='"+D2FullName+"',director2_dob ='"+D2dob+"',director2_nationality ='"+D2Nationality+"' WHERE email = '"+key+"'"
     let update = await connection.query(sql);
 
     return console.log("update");
@@ -255,8 +187,7 @@ dataregister_3 : async (req,res)=>{
 
 dataregister_4 : async (req,res)=>{
     try {
-    let Payload = await jwt.verify(req.params.id, 'SECRET');
-
+        const key = req.body.key;
     // Share Holder Info
 
     const SFullName = req.body.sfullName; // shareholder1_name
@@ -266,7 +197,7 @@ dataregister_4 : async (req,res)=>{
     const S2dob = req.body.s2dob; //shareholder2_dob
     const S2Nationality = req.body.s2Nationality; //shareholder2_nationality
 
-    let sql = "UPDATE tbl_user SET shareholder1_name ='"+SFullName+"', shareholder1_dob ='"+SDob+"',shareholder1_nationality ='"+SNationality+"',shareholder2_name ='"+S2FullName+"',shareholder2_dob ='"+S2dob+"',shareholder2_nationality ='"+S2Nationality+"' WHERE email = '"+Payload.user+"'"
+    let sql = "UPDATE tbl_user SET shareholder1_name ='"+SFullName+"', shareholder1_dob ='"+SDob+"',shareholder1_nationality ='"+SNationality+"',shareholder2_name ='"+S2FullName+"',shareholder2_dob ='"+S2dob+"',shareholder2_nationality ='"+S2Nationality+"' WHERE email = '"+key+"'"
     let update = await connection.query(sql);
 
     return console.log("update");
@@ -279,15 +210,15 @@ dataregister_4 : async (req,res)=>{
 
 dataregister_5 : async (req,res)=>{
     try {
-        let Payload = await jwt.verify(req.params.id, 'SECRET');
-    // company Profile
+        const key = req.body.key;
+        // company Profile
 
     const Website = req.body.website;
     const NatureOfBusiness = req.body.natureOfBusiness;
     const MontthlyVolume = req.body.montthlyVolume;
     const AverageTicketSize = req.body.averageTicketSize;
 
-    let sql = "UPDATE tbl_user SET website ='"+Website+"', job_title ='"+NatureOfBusiness+"', company_estimated_monthly_volume ='"+MontthlyVolume+"',company_avarage_ticket_size ='"+AverageTicketSize+"' WHERE email = '"+Payload.user+"'"
+    let sql = "UPDATE tbl_user SET website ='"+Website+"', job_title ='"+NatureOfBusiness+"', company_estimated_monthly_volume ='"+MontthlyVolume+"',company_avarage_ticket_size ='"+AverageTicketSize+"' WHERE email = '"+key+"'"
     let update = await connection.query(sql);
 
     return console.log("update");
@@ -300,9 +231,9 @@ dataregister_5 : async (req,res)=>{
 
 dataregister_6 : async (req,res)=>{
     try {
-        let Payload = await jwt.verify(req.params.id, 'SECRET');
+        const key = req.body.key
     //company porfile
-    console.log(Payload)
+    // console.log(Payload)
 
     const SettelmentInfo = req.body.settelmentInfo;
     const WalletAddress = req.body.walletAddress;
@@ -310,7 +241,7 @@ dataregister_6 : async (req,res)=>{
     // Settelment Info
     // Crypto Wallet Address (Optional)
 
-    let sql = "UPDATE tbl_user SET settle_currency ='"+SettelmentInfo+"', wallet ='"+WalletAddress+"' WHERE email = '"+Payload.user+"'"
+    let sql = "UPDATE tbl_user SET settle_currency ='"+SettelmentInfo+"', wallet ='"+WalletAddress+"' WHERE email = '"+key+"'"
     let update = await connection.query(sql);
 
     return console.log("update_6");
@@ -323,10 +254,11 @@ dataregister_6 : async (req,res)=>{
 /////////////////////////////////////diffferent////////////////////////////////////////
 
 verify: (req,res)=>{
-    const Email = req.body.email;
-    /// button will be used at at front end
 
-    let sql = "UPDATE tbl_user SET email_verification = '1' WHERE email = '"+Email+"'"
+    let Payload = await jwt.verify(req.params.id, 'SECRET');
+    // button will be used at at front end
+
+    let sql = "UPDATE tbl_user SET email_verification = '1' WHERE email = '"+Payload.user+"'"
     connection.query(sql,(err,update)=>{
     if(err){throw err}
     if(update){
@@ -334,6 +266,24 @@ verify: (req,res)=>{
     }
     });
 
+},
+
+forgotPassword: (req,res)=>{
+
+    let Payload = await jwt.verify(req.params.id, 'SECRET');
+
+    let Password = req.body.password
+
+    let sql = "UPDATE tbl_user SET password = '"+Password+"' WHERE email = '"+Payload.user+"'"
+    connection.query(sql,(err,update)=>{
+    if(err){throw err}
+    if(update){
+        console.log(update)
+        return res.send("password updated")
+    }
+    });
+
+    
 },
 
 changePassword: (req,res)=>{

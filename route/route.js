@@ -24,16 +24,20 @@ route.get("/",controller.get);
 
 route.post("/register",upload.none(),controller.register);
 
-route.post("/dataregister_1/:id",upload.none(),controller.dataregister_1);
+route.post("/dataregister_1",upload.none(),controller.dataregister_1);
 
-route.post("/dataregister_2/:id",upload.none(),controller.dataregister_2);
+route.post("/dataregister_2",upload.none(),controller.dataregister_2);
 
-route.post("/dataregister_3/:id",upload.none(),controller.dataregister_3);
+route.post("/dataregister_3",upload.none(),controller.dataregister_3);
 
-route.post("/dataregister_4/:id",upload.none(),controller.dataregister_4);
+route.post("/dataregister_4",upload.none(),controller.dataregister_4);
 
-route.post("/dataregister_5/:id",upload.none(),controller.dataregister_5);
+route.post("/dataregister_5",upload.none(),controller.dataregister_5);
 
-route.post("/dataregister_6/:id",upload.none(),controller.dataregister_6);
+route.post("/dataregister_6",upload.none(),controller.dataregister_6);
+
+route.post("/verify/:token",upload.none(),controller.verify);
+
+route.post("/forgotPassword/:token",upload.none(),controller.forgotPassword);
 
 module.exports = route
