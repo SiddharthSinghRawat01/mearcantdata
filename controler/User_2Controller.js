@@ -1,6 +1,6 @@
 const path = require('path');
 const connection = require("../config/db_connection")
-const bcrypt = require("bcrypt");
+const md5 = require("md5");
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const saltRound = 8 ;
@@ -67,20 +67,21 @@ if(!validEmail(Email)){
 }
 if(validEmail(Email)){
     // check if email = confirm email or password = confirmpassword
-     console.log("vallid email"+Email);
+     console.log("vallid email "+Email);
 
     if(Check(Email,ConfirmEmail) && Check(Password,ConfirmPassword)){
         console.log("working")
 
-    let hashPassword = await bcrypt.hash(Password,saltRound)
-
+    let hashPassword = md5(Password);
+    let token = await jwt.sign({user: Email}, 'SECRET');
+    console.log(token)
         if(hashPassword){
-
+        
         let sql = "INSERT INTO tbl_user (email,password,verification_token) VALUE ('"+Email+"','"+hashPassword+"','"+token+"')"
         let inserted = await connection.query(sql);
         if(inserted){
-            let token = await jwt.sign({user: Email}, 'SECRET');
-            let mail = await mail(Email,token); 
+            
+            // let mail = await mail(Email,token); 
             console.log(inserted)
 
         }
@@ -255,7 +256,7 @@ dataregister_6 : async (req,res)=>{
 
 verify: (req,res)=>{
 
-    let Payload = await jwt.verify(req.params.id, 'SECRET');
+    let Payload = jwt.verify(req.params.id, 'SECRET');
     // button will be used at at front end
 
     let sql = "UPDATE tbl_user SET email_verification = '1' WHERE email = '"+Payload.user+"'"
@@ -270,7 +271,7 @@ verify: (req,res)=>{
 
 forgotPassword: (req,res)=>{
 
-    let Payload = await jwt.verify(req.params.id, 'SECRET');
+    // let Payload = await jwt.verify(req.params.id, 'SECRET');
 
     let Password = req.body.password
 
@@ -289,11 +290,9 @@ forgotPassword: (req,res)=>{
 changePassword: (req,res)=>{
     const Email = req.body.email;
     
-    const NewPassword = req.body.newPassword
-
-    bcrypt.hash(NewPassword,saltRound,(err,hashPassword)=>{
-    if(err){throw err}
-    if(hashPassword){
+    const NewPassword = md5(req.body.newPassword)
+/// use md5 NOT BCRYPT
+    
         let sql = "UPDATE tbl_user SET password = '"+hashPassword+"' WHERE email = '"+Email+"'";
         connection.query(sql,(err,update)=>{
             if(err){throw err}
@@ -302,13 +301,35 @@ changePassword: (req,res)=>{
             }
         });
 
-    }
+},
 
+sign_in: (req,res)=>{
+
+    const Email = req.body.email
+    const Password = md5(req.body.password)
+
+    let sql = "SELECT * FROM tbl_user WHERE email = '"+Email+"' AND password = '"+Password+"'"
+    connection.query(sql,(err,data)=>{
+        if(err){throw err}
+        if(data){
+            console.log(data);
+            let token = jwt.sign({user: Email}, 'SECRET');
+            console.log(token)
+            const coo = res.cookie('name', token)
+            return res.send(200,{
+                message: "Take your tokem",
+                data: data
+            });
+        }else{
+            return res.send("Email Password do not match")
+        }
     });
+},
+
+
+
 
 }
 
-
-}
 
 module.exports = userco

@@ -24,6 +24,8 @@ route.get("/",controller.get);
 
 route.post("/register",upload.none(),controller.register);
 
+route.post("/sign_in",upload.none(),controller.sign_in);
+
 route.post("/dataregister_1",upload.none(),controller.dataregister_1);
 
 route.post("/dataregister_2",upload.none(),controller.dataregister_2);
@@ -36,7 +38,7 @@ route.post("/dataregister_5",upload.none(),controller.dataregister_5);
 
 route.post("/dataregister_6",upload.none(),controller.dataregister_6);
 
-route.post("/verify/:token",upload.none(),controller.verify);
+route.get("/verify/:token",upload.none(),controller.verify);
 
 route.post("/forgotPassword/:token",upload.none(),controller.forgotPassword);
 
