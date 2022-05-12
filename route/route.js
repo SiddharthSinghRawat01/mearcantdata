@@ -40,6 +40,8 @@ route.post("/dataregister_6",upload.none(),controller.dataregister_6);
 
 route.get("/verify/:token",upload.none(),controller.verify);
 
-route.post("/forgotPassword/:token",upload.none(),controller.forgotPassword);
+route.post("/forgotPassword",upload.none(),controller.forgotPassword);
+
+route.post("/changePassword",upload.none(),controller.changePassword);
 
 module.exports = route

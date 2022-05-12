@@ -1,6 +1,7 @@
 const config = require("./config")
 
 const mysql = require("mysql");
+const util = require('util');
 
 let connection = mysql.createConnection({
     host     : config.DB_HOST,
@@ -17,4 +18,6 @@ connection.connect((err)=>{
     }
 })
 
-module.exports = connection;
+const query = util.promisify(connection.query).bind(connection);
+
+module.exports = query;
